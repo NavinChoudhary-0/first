@@ -7,212 +7,272 @@ int max(int a,int b){
 	}
 	return b;
 }
-void add_fix(char *numb1,char *numb2){
-    int char1,char2;
-    int i, len1=strlen(numb1),len2=strlen(numb2),sum,carry=0,k=0;
-    i=len1-1;
-	int j=len2-1;
-	char ans[max(len1,len2)+1];
-	ans[max(len1,len2)]='0';
-    while(i>-1 && j>-1){
-        char1=numb1[i]-'0'; 
-        char2=numb2[j]-'0'; 
-        sum=char1 + char2 + carry;
-        carry=0;
+int isSmaller(char* str1, char* str2){
+	int n1 = strlen(str1),n2 = strlen(str2),i;
+	if (n1 < n2)
+		return 1;
+		
+	if (n2 < n1)
+		return 0;
+		
+	for ( i = 0 ; i < n1 ; i++){
+		if(str1[i] < str2[i])
+			return 1;
+		else if (str1[i] > str2[i])
+			return 0;
+    }
+	return 0;
+}
+void findDiff(char* str1, char* str2,int sign){
+	int n1 = strlen(str1), n2 = strlen(str2), sub;
+	char *ans,*neww;
+	neww=ans = (char*)malloc((n1+1) * sizeof(char));
+	ans[n1] = '\0';
+	strrev(str1);
+	strrev(str2);
+	int carry = 0, i;
+	for( i = 0 ; i < n2 ; i++){
+		 sub = ((str1[i]-'0')-(str2[i]-'0')-carry);
+		 
+		if( sub < 0 ) {
+			sub = sub+10;
+			carry = 1;
+		}
+		else
+			carry = 0;
+			
+		ans[i] = sub + '0';
+	}
+	for( i ;i < n1 ;i++){
+		 sub = ((str1[i] - '0') - carry);
+		if (sub < 0) {
+			sub = sub + 10;
+			carry = 1;
+		}
+		else
+			carry = 0;
+
+	    ans[i] = sub + '0';
+	}
+	strrev(ans);
+	i = 0;
+	while( ans[i] == '0' && i < n1-1 ){
+		i++;
+	}
+	ans = (ans + i);
+	if(sign)
+	printf("-");
+	
+	printf("%s",ans);
+	free(neww);
+}
+void add_fix(char *numb1,char *numb2,int sign ){
+    int len1 = strlen(numb1), len2 = strlen(numb2);
+    
+	int char1, char2, i , sum , carry , k , j , temp;
+    
+	i = len1-1;
+	j = len2-1;
+    k = 0;
+	carry = 0;
+	temp = max(len1,len2);
+	char ans[temp+1];
+	ans[temp] = '0';
+    while( i > -1 && j > -1 ){
+    	
+        char1 = numb1[i]-'0'; 
+        char2 = numb2[j]-'0'; 
+        sum = char1 + char2 + carry;
+        carry = 0;
         if(sum > 9){ 
             carry = 1;
-            sum-=10;
+            sum -= 10;
         }
         ans[k] = sum+'0';
         k++;
         i--;j--;
     }   
-    	while(j>-1){
-    	char1=numb1[j]-'0';
-    	sum=char1+carry;
-    	carry=0;
-    	if(sum>9){
-    		carry=1;
-    		sum-=10;
+    while( j > -1 ){
+        char1 = numb1[j] - '0';
+    	sum = char1 + carry;
+    	carry = 0;
+    if( sum > 9 ){
+    	   carry = 1;
+    	   sum -= 10;
 		}
-    	ans[k]=sum+'0';
+    	ans[k] = sum + '0';
     	k++;
     	j--;
 		}
-		while(i>-1){
-    	char1=numb1[i]-'0';
-    	sum=char1+carry;
-    	carry=0;
-    	if(sum>9){
-    		carry=1;
-    		sum-=10;
+	while( i > -1 ){
+		char1 = numb1[i] -'0' ;
+    	sum = char1 + carry;
+    	carry = 0;
+    if( sum > 9 ){
+    		carry = 1;
+    		sum -=10 ;
 		}
-    	ans[k]=sum+'0';
+    	ans[k] = sum + '0';
     	k++;
     	i--;
 		}
-    if(carry>0)
+    if( carry > 0 )
 	ans[k]='1';
 	 
-	i=max(len1,len2);
-	while(i>0 && ans[i]=='0')
+	i = temp;
+	while( i > 0 && ans[i] == '0')
 	i--;
 	
-	while(i>-1){
+	if(sign==1){
+		printf("-");
+	}
+	while( i > -1 ){
 		printf("%c",ans[i]);
 		i--;
 	}	
 }
-void add(char *numb1,char *numb2) {
-  int len1=strlen(numb1);
-  int len2=strlen(numb2);
-  if(len1>len2){
-  	add_fix(numb1,numb2);
+void add(char *numb1,char *numb2,int sign) {
+  int len1 = strlen(numb1);
+  
+  int len2 = strlen(numb2);
+  
+  if( len1 > len2 ){
+  	add_fix( numb1 , numb2 ,sign);
   }else{
-  	add_fix(numb2,numb1);
+  	add_fix( numb2 , numb1 ,sign);
   }
 }
-void multiply(char* numb1, char* numb2){
-	char s='1';
-	int len1=strlen(numb1);
-	int len2=strlen(numb2);
+void multiply(char* numb1, char* numb2,int sign){
+	char s = '1';
+	
+	int len1 = strlen(numb1),i;
+	
+	int len2 = strlen(numb2);
+	
 	int ans[len1+len2];
-	if (len1==0||len2==0)
+	
+	if ( len1 == 0 || len2 == 0 )
 	s='0';
 	else{
-	for(int i=0;i<len1+len2;i++){
-		ans[i]=0;
+	for( i = 0; i < len1+len2; i++){
+		ans[i] = 0;
 	}
-	int i_n1 = 0,carry,digit_1,digit_2,sum;
-	int i_n2 = 0;
-	for (int i=len1-1; i>=0; i--){
+	int k = 0, carry,digit_1,digit_2,sum,j;
+	int l = 0;
+	for ( i = len1-1; i >= 0; i--){
+		
 		carry=0;
 		digit_1= numb1[i]-'0';
-		i_n2 = 0;			
-		for (int j=len2-1; j>=0; j--){
-		digit_2 = numb2[j]-'0';
-     	sum = digit_1*digit_2 + ans[i_n1 + i_n2] + carry;
+		l = 0;			
+		for ( j = len2-1; j >= 0; j--){
+			
+		digit_2 = numb2[j] - '0';
+     	sum = digit_1 * digit_2 + ans[ k + l ] + carry;
        	carry = sum/10;
-    	ans[i_n1 + i_n2] = sum % 10;
-		i_n2++;
+    	ans[ k + l ] = sum % 10;
+		l++;
 		}
        if (carry > 0)
-			ans[i_n1 + i_n2] += carry;
+			ans[ k + l ] += carry;
 			
-       	i_n1++;
+       k++;
 	}
-    int i = len1+len2 - 1;
+    i = len1+len2 - 1;
 	while (i>=0 && ans[i] == 0)
 	i--;
 	if (i == -1){
 	s= '0';
    }else{
+   	if(sign==1){
+   		printf("-");
+	   }
 	char text[10];
-	while (i >= 0){
+	while ( i >= 0 ){
 		sprintf(text, "%d", ans[i--]);
 		printf("%s",text);
 	}
 }
 }
-    if(s=='0')
+    if(s == '0')
 	printf("0");
 	 
 }
-void add_complement(char* numb1,char* numb2){
-	int len1=strlen(numb1),len2=strlen(numb2),n=max(len1,len2);
-	char arr1[n+1],arr2[n+1];
-	printf("%s",numb2);
-	arr2[n]='\0';
-	arr1[n]='\0';
-	int j=0,i;
-	if(len1>len2){
-		i=len1-len2;
-		while(i--){
-			arr2[j]='9';
-			j++;
-		}
-		i=len1-len2;
-		for(j;j<n;j++){
-			arr2[j]=numb2[j-i];
-		}
-		strcat(arr1,numb1);
-	}else{
-		i=len2-len1;
-		while(i--){
-			arr1[j]='0';
-			j++;
-		}
-	strcat(arr2,numb2);
-	}
-	
-	printf("%s\n%s\n",arr1,arr2);
-	int char1,char2;
-    int sum,carry=0,k=0;
-	i=n-1;
-	char ans[n];
-    while(i>-1){
-        char1=arr1[i]-'0'; 
-        char2=arr2[i]-'0'; 
-        printf("%c %c\n",arr1[i],arr2[i]);
-        sum=char1 + char2 + carry;
-        carry=0;
-        if(sum > 9){ 
-            carry = 1;
-            sum-=10;
-        }
-        ans[k] = sum+'0';
-        printf("%c \n",ans[k]);
-        k++;
-        i--;
-  }
-  printf("%s",ans);
-    if(carry>0){
-    	i=0;
-    while(i<max(len1,len2) && carry!=0){
-    	sum=ans[i]-'0'+1;
-    	carry=0;
-    	if(sum>9){
-    		carry=1;
-    		sum-=10;
-		}
-		ans[i]=sum+'0';
-    	i++;
-	}
-	if(carry==1){
-		printf("1");
-	}
-	}else{
- 	for(int i=max(len1,len2)-1;i>-1;i--){
-		ans[i]='9'-ans[i];
-	}
-	printf("-");
- }
-    i=max(len1,len2)-1;
-    while(i>-1){
-    	printf("%c",ans[i]);
-    	i--;
-	}
-	
-}
+
 void sub(char* numb1,char* numb2){
-	int len1=strlen(numb1),len2=strlen(numb2);
-	for(int i=0;i<len2;i++){
-	      numb2[i]='9'-numb2[i]+'0';
-	      printf("%c",numb2[i]);
-	}
-	printf("\n");
-	add_complement(numb1,numb2);
+	int len1 = strlen(numb1), len2 = strlen(numb2);
 	
+	if(isSmaller(numb1, numb2))
+		findDiff(numb2, numb1,1);
+	else
+		findDiff(numb1,numb2,0);
 }
+
 int main(){
+	int sign1=0,sign2=0;
+	char *numb1, *numb2, *no1, *no2;
 	
-	char numb1[310],numb2[310];
-	printf("Enter the numbers;\nFirst: ");
+	no1=numb1=(char *)malloc(310*sizeof(char));
+	
+	no2=numb2=(char *)malloc(310*sizeof(char));
+	
+	printf("Enter the numbers\nFirst: ");
 	gets(numb1);
+	
 	printf("Second: ");
 	gets(numb2);
-//	multiply(numb1,numb2);
-//	add(numb1,numb2);
-    sub(numb1,numb2);
+	
+	if(  numb1[0]=='-'){
+		sign1=1;
+		numb1=numb1+1;
+	}
+	
+	if(numb2[0] == '-'){
+		numb2=numb2+1;
+	    sign2=1;	
+	}
+	
+	printf("Press 0 for addition 1 for substraction and 2 for multiplication: \n");
+	
+	int n;
+	scanf("%d",&n);
+	
+	if(n==0){
+    printf("Addition of this two number:\n");
+	if(sign1==sign2){
+	add(numb1,numb2,sign1);
+	}else{
+		if(sign1==1){
+			sub(numb2,numb1);
+		}else{
+			sub(numb1,numb2);
+		}
+	}
+     printf("\n");
+	
+	}else if(n==1){
+     printf("Substraction of this two number\n");
+     if(sign1==1 &&sign2==1){
+     	sub(numb2,numb1);
+	 }else if(sign1==0 && sign2==0){
+        sub(numb1,numb2);
+	 }else if(sign1==0 && sign2==1){
+	 	add(numb1,numb2,0);
+	 }else{
+	 	add(numb1,numb2,1);
+	 }
+    
+	}else{
+		if(sign1!=sign2){
+			sign1=1;
+		}else{
+			sign1=0;
+		} 
+	 printf("Multliplication of this two number:\n");
+	multiply(numb1,numb2,sign1);
+    printf("\n");
+	}
+	
+	free(no1);
+	free(no2);
 	return 0;
 }
